@@ -19,8 +19,12 @@
  */
 
 @theme inline {
-  --font-sans: "SF Pro Text", "SF Pro Display", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-display: "SF Pro Display", "SF Pro Text", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans:
+    "SF Pro Text", "SF Pro Display", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-display:
+    "SF Pro Display", "SF Pro Text", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -156,16 +160,68 @@
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.01em;
   }
-  html { scroll-behavior: smooth; }
-  h1, h2, h3 { text-wrap: balance; letter-spacing: -0.045em; }
+  html {
+    scroll-behavior: smooth;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    letter-spacing: -0.045em;
+  }
 }
 
 @layer components {
-  .section-kicker { color: var(--color-primary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
-  .section-title { font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4.75rem); font-weight: 700; letter-spacing: -0.055em; line-height: 0.98; }
-  .photo-shade { background: linear-gradient(90deg, color-mix(in oklab, var(--footer) 88%, transparent), color-mix(in oklab, var(--footer) 30%, transparent), transparent); }
+  .section-kicker {
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4.75rem);
+    font-weight: 700;
+    letter-spacing: -0.055em;
+    line-height: 0.98;
+  }
+  .photo-shade {
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--footer) 88%, transparent),
+      color-mix(in oklab, var(--footer) 30%, transparent),
+      transparent
+    );
+  }
 }
 
-@keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-.animate-rise { animation: rise .9s cubic-bezier(.22,1,.36,1) both; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; } }
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-rise {
+  animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ... keep any other custom CSS rules you have underneath unchanged ... */
+/* Delete these lines from the bottom */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ... keep any other custom CSS rules you have underneath unchanged ... */
