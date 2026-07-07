@@ -11,7 +11,6 @@ export const Route = createFileRoute("/admin/login")({
 
 function AdminLogin() {
   const router = useRouter();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -22,20 +21,11 @@ function AdminLogin() {
     setError(null);
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin/dashboard` },
-        });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
       router.navigate({ to: "/admin/dashboard" });
     } catch (err: any) {
-      setError(err.message ?? "Authentication failed");
+      setError("Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -47,7 +37,7 @@ function AdminLogin() {
         <div className="text-center">
           <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary text-lg font-bold text-primary-foreground">M</div>
           <h1 className="mt-4 font-display text-3xl font-bold">Maharaja Admin</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{mode === "signup" ? "Create the first admin account" : "Sign in to manage your store"}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Sign in to manage your store</p>
         </div>
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
@@ -56,21 +46,13 @@ function AdminLogin() {
           </div>
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+            <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
           </div>
           {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" size="lg" disabled={loading}>
-            {loading ? "Please wait…" : mode === "signup" ? "Create admin account" : "Sign in"}
+            {loading ? "Please wait…" : "Sign in"}
           </Button>
         </form>
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          {mode === "signin" ? (
-            <>First time here? <button onClick={() => setMode("signup")} className="font-semibold text-primary hover:underline">Create the admin account</button></>
-          ) : (
-            <>Already have an account? <button onClick={() => setMode("signin")} className="font-semibold text-primary hover:underline">Sign in</button></>
-          )}
-        </p>
-        <p className="mt-2 text-center text-[11px] text-muted-foreground">The first registered user is granted admin access automatically.</p>
       </div>
     </div>
   );
