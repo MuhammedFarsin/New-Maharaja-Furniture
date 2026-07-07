@@ -1,396 +1,444 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, Ruler, TreePine, Truck, ShieldCheck, Hammer } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  MessageCircle,
+  Phone,
+  Share2,
+  Star,
+  TreePine,
+  Ruler,
+  PackageCheck,
+  ChevronRight as RightIcon,
+} from "lucide-react";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { BUSINESS } from "@/lib/config";
 import { formatPrice } from "@/lib/furniture-data";
-import { BUSINESS, generalWhatsAppLink } from "@/lib/config";
 import { useProductBySlug, useProducts } from "@/lib/products-db";
 
-import { ProductCard } from "@/components/product-card";
-
-import { Navbar } from "@/scenes/navbar";
-import Footer from "@/scenes/Footer";
+import { ProductCardV2 } from "@/components/product-card-v2";
 
 export const Route = createFileRoute("/products/$productId")({
-  head: ({ params }) => ({
-    meta: [
-      {
-        title: `${params.productId} | Maharaja Furniture`,
-      },
-      {
-        name: "description",
-        content: "Premium teak furniture from Maharaja Furniture.",
-      },
-    ],
-  }),
   component: ProductDetails,
 });
 
 function ProductDetails() {
   const { productId } = Route.useParams();
 
-  const { data: p, isLoading } = useProductBySlug(productId);
+  const { data: product, isLoading } = useProductBySlug(productId);
+  const { data: products = [] } = useProducts();
 
-  // Used later for Similar Products
-  const { data: allProducts = [] } = useProducts();
-
-  const [activeIdx, setActiveIdx] = useState(0);
+  const [activeImage, setActiveImage] = useState(0);
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#faf8f5]">
-        <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-red-700 border-t-transparent" />
-          <p className="mt-5 text-gray-500">Loading Product...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-red-600 border-t-transparent" />
       </div>
     );
   }
 
-  if (!p) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#faf8f5]">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold">Product Not Found</h1>
-
-          <p className="mt-4 text-gray-500">This product may have been removed.</p>
-        </div>
-      </div>
-    );
+  if (!product) {
+    return <div className="flex min-h-screen items-center justify-center">Product not found</div>;
   }
 
-  const images = p.images ?? [];
+  const images = product.images ?? [];
+  const selectedImage = images[activeImage] ?? images[0];
 
-  const active = images[activeIdx] ?? images[0];
-
-  // Related Products
-  const similarProducts = allProducts
-    .filter((product) => product.id !== p.id && product.category?.id === p.category?.id)
-    .slice(0, 4);
+  const similarProducts = products
+    .filter((p) => p.category?.id === product.category?.id && p.id !== product.id)
+    .slice(0, 6);
 
   return (
-    <>
-      <Navbar />
+    <div className="min-h-screen bg-white pb-28">
+      {/* Header */}
 
-      {/* Hero */}
-      <section className="bg-[#faf8f5] pt-44 pb-20">
-        <div className="mx-auto max-w-6xl px-6 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-red-700">
-            {p.category?.name ?? "Furniture"}
-          </p>
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-neutral-200">
+        <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4">
+          <Link
+            to="/products"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-neutral-100"
+          >
+            <ArrowLeft size={20} />
+          </Link>
 
-          <h1 className="mt-5 text-5xl font-bold text-gray-900 md:text-7xl">{p.name}</h1>
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator
+                  .share({
+                    title: product.name,
+                    url: window.location.href,
+                  })
+                  .catch(() => {});
+              }
+            }}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-neutral-100"
+          >
+            <Share2 size={20} />
+          </button>
+        </div>
+      </header>
+      {/* Product Gallery */}
 
-          <p className="mt-6 text-3xl font-bold text-red-700">{formatPrice(p.price)}</p>
+      <section className="mx-auto mt-4 max-w-4xl px-4">
+        <div className="overflow-hidden rounded-[28px] bg-[#f7f7f7]">
+          <div className="relative">
+            {selectedImage && (
+              <img
+                src={selectedImage.url}
+                alt={product.name}
+                className="
+                  h-[360px]
+                  w-full
+                  object-contain
+                  sm:h-[500px]
+                "
+              />
+            )}
+
+            {/* Image Counter */}
+
+            {images.length > 1 && (
+              <div
+                className="
+                  absolute
+                  bottom-5
+                  right-5
+                  rounded-full
+                  bg-white/95
+                  px-4
+                  py-2
+                  text-sm
+                  font-semibold
+                  text-neutral-700
+                  shadow-md
+                "
+              >
+                {activeImage + 1} / {images.length}
+              </div>
+            )}
+
+            {/* Previous */}
+
+            {images.length > 1 && (
+              <button
+                onClick={() =>
+                  setActiveImage((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+                }
+                className="
+                  absolute
+                  left-4
+                  top-1/2
+                  -translate-y-1/2
+                  flex
+                  h-11
+                  w-11
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-white/95
+                  shadow-lg
+                "
+              >
+                <ChevronLeft size={22} />
+              </button>
+            )}
+
+            {/* Next */}
+
+            {images.length > 1 && (
+              <button
+                onClick={() =>
+                  setActiveImage((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+                }
+                className="
+                  absolute
+                  right-4
+                  top-1/2
+                  -translate-y-1/2
+                  flex
+                  h-11
+                  w-11
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-white/95
+                  shadow-lg
+                "
+              >
+                <ChevronRight size={22} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Thumbnails */}
+
+        {images.length > 1 && (
+          <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+            {images.map((img, index) => (
+              <button
+                key={img.id}
+                onClick={() => setActiveImage(index)}
+                className={`
+                  shrink-0
+                  overflow-hidden
+                  rounded-2xl
+                  border-2
+                  transition-all
+                  ${activeImage === index ? "border-red-600" : "border-neutral-200"}
+                `}
+              >
+                <img
+                  src={img.url}
+                  alt={product.name}
+                  className="
+                    h-20
+                    w-20
+                    object-cover
+                  "
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+      {/* Product Information */}
+
+      <section className="mx-auto mt-6 max-w-4xl px-4">
+        <div className="rounded-[28px] bg-white p-6 shadow-sm">
+          {/* Category */}
+
+          {product.category && (
+            <span className="inline-flex rounded-full bg-red-50 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-red-600">
+              {product.category.name}
+            </span>
+          )}
+
+          {/* Product Name */}
+
+          <h1 className="mt-4 text-3xl font-bold leading-tight text-neutral-900">{product.name}</h1>
+
+          {/* Rating */}
+
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex text-amber-400">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} size={16} fill="currentColor" />
+              ))}
+            </div>
+
+            <span className="text-sm text-neutral-500">(24 Reviews)</span>
+          </div>
+
+          {/* Price */}
+
+          <div className="mt-4 flex items-center gap-3">
+            <h2 className="text-4xl font-bold text-red-600">{formatPrice(product.price)}</h2>
+
+            <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+              In Stock
+            </span>
+          </div>
+
+          {/* Information Chips */}
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            {product.material && (
+              <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2">
+                <TreePine size={16} />
+                <span className="text-sm font-medium">{product.material}</span>
+              </div>
+            )}
+
+            {product.dimensions && (
+              <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2">
+                <Ruler size={16} />
+                <span className="text-sm font-medium">{product.dimensions}</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2">
+              <PackageCheck size={16} />
+              <span className="text-sm font-medium">Premium Quality</span>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Product Details */}
-      <section className="px-6 py-20">
-        <div className="mx-auto grid max-w-7xl gap-16 lg:grid-cols-[1.15fr_.85fr]">
-          {/* Gallery */}
-          <div>
-            {/* Main Image */}
-            <div className="overflow-hidden rounded-[36px] bg-[#f5f5f7] shadow-sm">
-              {active && (
-                <img
-                  src={active.url}
-                  alt={p.name}
-                  className="
-          h-full
-          w-full
-          object-contain
-          transition-all
-          duration-500
-        "
-                />
-              )}
-            </div>
 
-            {/* Thumbnails */}
-            {images.length > 1 && (
-              <div className="mt-5 grid grid-cols-4 gap-4">
-                {images.map((img, i) => (
-                  <button
-                    key={img.id}
-                    onClick={() => setActiveIdx(i)}
-                    className={`
-            overflow-hidden
-            rounded-2xl
-            border-2
-            transition-all
-            ${i === activeIdx ? "border-red-700" : "border-transparent hover:border-neutral-300"}
-          `}
-                  >
-                    <img
-                      src={img.url}
-                      alt={p.name}
-                      className="
-              aspect-square
-              h-full
-              w-full
-              object-cover
-            "
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
+      <section className="mx-auto mt-5 max-w-4xl px-4">
+        <div className="overflow-hidden rounded-[28px] bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b px-6 py-5">
+            <span className="font-semibold">Category</span>
+
+            <div className="flex items-center gap-2">
+              <span className="text-neutral-500">{product.category?.name ?? "-"}</span>
+
+              <RightIcon size={18} />
+            </div>
           </div>
 
-          {/* Product Information */}
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-[36px] bg-[#faf8f5] p-8 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-red-700">
-                {p.category?.name ?? "Furniture"}
-              </p>
+          <div className="flex items-center justify-between border-b px-6 py-5">
+            <span className="font-semibold">Material</span>
 
-              <h2 className="mt-4 text-4xl font-bold text-neutral-900">{p.name}</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-neutral-500">{product.material ?? "-"}</span>
 
-              <p className="mt-4 text-3xl font-bold text-red-700">{formatPrice(p.price)}</p>
+              <RightIcon size={18} />
+            </div>
+          </div>
 
-              {p.description && <p className="mt-6 leading-8 text-neutral-600">{p.description}</p>}
+          <div className="flex items-center justify-between border-b px-6 py-5">
+            <span className="font-semibold">Dimensions</span>
 
-              {/* Specifications */}
-              <div className="mt-10 space-y-4">
-                {p.material && (
-                  <div className="flex items-start gap-4 rounded-2xl bg-white p-5 shadow-sm">
-                    <TreePine className="mt-1 h-5 w-5 text-red-700" />
+            <div className="flex items-center gap-2">
+              <span className="text-neutral-500">{product.dimensions ?? "-"}</span>
 
-                    <div>
-                      <h3 className="font-semibold">Material</h3>
+              <RightIcon size={18} />
+            </div>
+          </div>
 
-                      <p className="mt-1 text-neutral-500">{p.material}</p>
-                    </div>
-                  </div>
-                )}
+          <div className="px-6 py-6">
+            <h3 className="mb-3 text-lg font-bold">Description</h3>
 
-                {p.dimensions && (
-                  <div className="flex items-start gap-4 rounded-2xl bg-white p-5 shadow-sm">
-                    <Ruler className="mt-1 h-5 w-5 text-red-700" />
+            <p className="leading-8 text-neutral-600">
+              {product.description ||
+                `Crafted using premium quality wood with excellent durability and elegant finishing. Built to provide long-lasting comfort while enhancing the beauty of your home.`}
+            </p>
+          </div>
+        </div>
+      </section>
+      {/* Similar Products */}
 
-                    <div>
-                      <h3 className="font-semibold">Dimensions</h3>
+      {similarProducts.length > 0 && (
+        <section className="mx-auto mt-8 max-w-4xl px-4">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-neutral-900">Similar Products</h2>
 
-                      <p className="mt-1 text-neutral-500">{p.dimensions}</p>
-                    </div>
-                  </div>
-                )}
+            <Link to="/products" className="text-sm font-semibold text-red-600">
+              View All
+            </Link>
+          </div>
 
-                <div className="flex items-start gap-4 rounded-2xl bg-white p-5 shadow-sm">
-                  <Hammer className="mt-1 h-5 w-5 text-red-700" />
-
-                  <div>
-                    <h3 className="font-semibold">Customisation</h3>
-
-                    <p className="mt-1 text-neutral-500">Available in custom sizes and finishes.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 rounded-2xl bg-white p-5 shadow-sm">
-                  <Truck className="mt-1 h-5 w-5 text-red-700" />
-
-                  <div>
-                    <h3 className="font-semibold">Delivery</h3>
-
-                    <p className="mt-1 text-neutral-500">
-                      Safe delivery available across Tamil Nadu.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 rounded-2xl bg-white p-5 shadow-sm">
-                  <ShieldCheck className="mt-1 h-5 w-5 text-red-700" />
-
-                  <div>
-                    <h3 className="font-semibold">Quality</h3>
-
-                    <p className="mt-1 text-neutral-500">Crafted using premium quality wood.</p>
-                  </div>
-                </div>
+          <div
+            className="
+              flex
+              gap-4
+              overflow-x-auto
+              pb-2
+              snap-x
+              snap-mandatory
+              scrollbar-hide
+            "
+          >
+            {similarProducts.map((item) => (
+              <div
+                key={item.id}
+                className="
+                  w-[170px]
+                  shrink-0
+                  snap-start
+                "
+              >
+                <ProductCardV2 product={item} />
               </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-              {/* WhatsApp */}
-              <a
-                href={`https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(
-                  `Hello ${BUSINESS.name},
+      {/* Bottom Action Bar */}
+
+      <div
+        className="
+          fixed
+          bottom-0
+          left-0
+          right-0
+          z-50
+          border-t
+          border-neutral-200
+          bg-white/95
+          backdrop-blur-xl
+        "
+      >
+        <div className="mx-auto flex max-w-4xl gap-3 p-4">
+          {/* WhatsApp */}
+
+          <a
+            href={`https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(
+              `Hello ${BUSINESS.name},
 
 I'm interested in this product.
 
 ━━━━━━━━━━━━━━━━━━━━
 
-🆔 Product Code : ${p.product_code ?? "-"}
+🆔 Product Code : ${product.product_code ?? "-"}
 
-🪑 Product Name : ${p.name}
+🪑 Product Name : ${product.name}
 
-🏷️ Category : ${p.category?.name ?? "Furniture"}
+🏷️ Category : ${product.category?.name ?? "-"}
 
-💰 Price : ${formatPrice(p.price)}
-
-🔗 Product Link :
-${BUSINESS.siteUrl}/products/${p.slug}
+💰 Price : ${formatPrice(product.price)}
 
 ━━━━━━━━━━━━━━━━━━━━
 
-Please let me know whether this product is currently available.
+Please let me know whether this product is available.`,
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="
+              flex
+              h-14
+              flex-1
+              items-center
+              justify-center
+              gap-2
+              rounded-2xl
+              border-2
+              border-green-600
+              bg-white
+              font-semibold
+              text-green-600
+              transition-all
+              hover:bg-green-50
+            "
+          >
+            <MessageCircle size={20} />
+            WhatsApp
+          </a>
 
-Thank you.`,
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button
-                  size="lg"
-                  className="
-          mt-10
-          h-14
-          w-full
-          rounded-full
-          bg-red-700
-          hover:bg-red-800
-        "
-                >
-                  <MessageCircle className="mr-2 h-5 w-5" />
-                  WhatsApp Enquiry
-                </Button>
-              </a>
+          {/* Call */}
 
-              <p className="mt-4 text-center text-sm text-neutral-500">
-                Ask about availability, custom sizes and delivery.
-              </p>
-            </div>
-          </div>
+          <a
+            href={`tel:${BUSINESS.phone}`}
+            className="
+              flex
+              h-14
+              flex-1
+              items-center
+              justify-center
+              gap-2
+              rounded-2xl
+              bg-red-600
+              font-semibold
+              text-white
+              transition-all
+              hover:bg-red-700
+            "
+          >
+            <Phone size={20} />
+            Call Now
+          </a>
         </div>
-      </section>
-      {/* About Product */}
-      <section className="bg-white py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="max-w-4xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-red-700">
-              About This Product
-            </p>
-
-            <h2 className="mt-4 text-4xl font-bold text-neutral-900">
-              Crafted For Everyday Living
-            </h2>
-
-            <p className="mt-8 text-lg leading-9 text-neutral-600">
-              {p.description ||
-                `Our ${p.name} is carefully crafted using premium quality materials and
-          designed to provide durability, elegance and long-lasting comfort.
-          Every piece is manufactured with attention to detail and can also be
-          customised according to your preferred dimensions, finish and storage
-          requirements.`}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Custom Furniture CTA */}
-      <section className="bg-[#faf8f5] py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="overflow-hidden rounded-[40px] bg-gradient-to-r from-red-700 to-red-800 p-12 text-white">
-            <p className="text-xs uppercase tracking-[0.35em] text-white/80">Custom Furniture</p>
-
-            <h2 className="mt-4 text-4xl font-bold">Need This Furniture In Another Size?</h2>
-
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-white/80">
-              We manufacture furniture according to your preferred size, wood type, storage options,
-              finish and design. If you cannot find the exact furniture you need, we'll build it
-              specially for you.
-            </p>
-
-            <div className="mt-10 flex flex-wrap gap-4">
-              <div className="rounded-full bg-white/10 px-5 py-3">✓ Custom Sizes</div>
-
-              <div className="rounded-full bg-white/10 px-5 py-3">✓ Premium Teak Wood</div>
-
-              <div className="rounded-full bg-white/10 px-5 py-3">✓ Storage Options</div>
-
-              <div className="rounded-full bg-white/10 px-5 py-3">✓ Premium Finish</div>
-            </div>
-
-            <a href={generalWhatsAppLink()} target="_blank" rel="noopener noreferrer">
-              <Button
-                size="lg"
-                className="mt-12 rounded-full bg-white px-8 py-6 text-red-700 hover:bg-neutral-100"
-              >
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Request Custom Furniture
-              </Button>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Similar Products */}
-      {similarProducts.length > 0 && (
-        <section className="py-24">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="mb-12 text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-red-700">
-                You May Also Like
-              </p>
-
-              <h2 className="mt-4 text-5xl font-bold text-neutral-900">Similar Products</h2>
-            </div>
-
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {similarProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Why Choose Maharaja */}
-      <section className="bg-[#faf8f5] py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-red-700">
-              Why Choose Maharaja Furniture
-            </p>
-
-            <h2 className="mt-4 text-5xl font-bold text-neutral-900">
-              Built To Last For Generations
-            </h2>
-          </div>
-
-          <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                title: "Premium Wood",
-                desc: "Carefully selected premium quality wood for lasting durability.",
-              },
-              {
-                title: "Custom Manufacturing",
-                desc: "Furniture built according to your preferred dimensions.",
-              },
-              {
-                title: "Experienced Craftsmen",
-                desc: "Skilled artisans with years of furniture making experience.",
-              },
-              {
-                title: "Reliable Delivery",
-                desc: "Safe delivery and installation for complete peace of mind.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="rounded-3xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-              >
-                <h3 className="text-xl font-bold text-neutral-900">{item.title}</h3>
-
-                <p className="mt-4 leading-7 text-neutral-500">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-    </>
+      </div>
+    </div>
   );
 }
+
+export default ProductDetails;
