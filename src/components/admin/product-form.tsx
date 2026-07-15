@@ -102,13 +102,15 @@ export function ProductForm({ existing }: { existing?: Product }) {
     generateProductCode();
   }, [values.category_id, categories]);
   useEffect(() => {
-    if (autoSlug) {
-      setValues((prev) => ({
-        ...prev,
-        slug: slugify(prev.name),
-      }));
-    }
-  }, [values.name, autoSlug]);
+    if (!autoSlug) return;
+
+    const slug = slugify(`${values.product_code} ${values.name}`.trim());
+
+    setValues((prev) => ({
+      ...prev,
+      slug,
+    }));
+  }, [values.product_code, values.name, autoSlug]);
 
   // Browser image compression options
   const compressionOptions = {

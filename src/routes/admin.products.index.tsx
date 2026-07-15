@@ -17,7 +17,13 @@ function ProductsList() {
   const [query, setQuery] = useState("");
   const qc = useQueryClient();
 
-  const filtered = products.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()));
+  const filtered = products.filter((p) => {
+    const search = query.toLowerCase().trim();
+
+    return (
+      p.name.toLowerCase().includes(search) || (p.product_code ?? "").toLowerCase().includes(search)
+    );
+  });
 
   const del = useMutation({
     mutationFn: async (id: string) => {
@@ -35,7 +41,9 @@ function ProductsList() {
           <p className="text-sm text-muted-foreground">Manage your furniture catalogue</p>
         </div>
         <Button asChild className="w-full sm:w-auto">
-          <Link to="/admin/products/new"><Plus className="h-4 w-4" /> Add Product</Link>
+          <Link to="/admin/products/new">
+            <Plus className="h-4 w-4" /> Add Product
+          </Link>
         </Button>
       </div>
 
@@ -45,14 +53,12 @@ function ProductsList() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name..."
+            placeholder="Search by product name or product code..."
             className="border-0 shadow-none focus-visible:ring-0"
           />
         </div>
 
-        {isLoading && (
-          <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>
-        )}
+        {isLoading && <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>}
         {!isLoading && filtered.length === 0 && (
           <p className="py-6 text-center text-sm text-muted-foreground">No products found.</p>
         )}
@@ -132,7 +138,11 @@ function ProductsList() {
                   <tr key={p.id} className="align-middle">
                     <td className="py-3 pr-4">
                       <div className="flex items-center gap-3">
-                        <img src={p.images[0]?.url} alt="" className="h-12 w-12 rounded-md object-cover" />
+                        <img
+                          src={p.images[0]?.url}
+                          alt=""
+                          className="h-12 w-12 rounded-md object-cover"
+                        />
                         <div className="min-w-0">
                           <p className="truncate font-semibold">
                             {p.product_code}{" "}
