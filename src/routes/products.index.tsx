@@ -7,24 +7,24 @@ import { ProductCardV2 } from "@/components/product-card-v2";
 import { useCategories, useProducts } from "@/lib/products-db";
 import { Navbar } from "@/scenes/navbar";
 import Footer from "@/scenes/Footer";
+import { seo } from "@/lib/seo";
 
 const searchSchema = z.object({
   category: z.string().optional(),
   collection: z.string().optional(),
 });
 
+
 export const Route = createFileRoute("/products/")({
   validateSearch: searchSchema,
-  head: () => ({
-    meta: [
-      { title: "Teak Furniture Collection | Maharaja Furniture" },
-      {
-        name: "description",
-        content:
-          "Browse teak beds, sofas, dining tables, wardrobes, chairs and custom furniture from Maharaja Furniture.",
-      },
-    ],
-  }),
+
+  head: () =>
+    seo(
+      "Furniture Products | New Maharaja Furniture",
+      "Browse premium teak wood furniture including sofa sets, cots, wardrobes, dining tables, TV units, mattresses, chairs and custom furniture in Coimbatore.",
+      "/products"
+    ),
+
   component: ProductsPage,
 });
 

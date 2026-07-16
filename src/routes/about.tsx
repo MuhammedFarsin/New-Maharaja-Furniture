@@ -3,18 +3,15 @@ import { Eye, Gem, Target, type LucideIcon } from "lucide-react";
 import { images } from "@/lib/furniture-data";
 import { Navbar } from "@/scenes/navbar";
 import Footer from "@/scenes/Footer";
+import { seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About Maharaja Furniture | Our Craft" },
-      {
-        name: "description",
-        content:
-          "Learn about Maharaja Furniture's commitment to teak wood, skilled craftsmanship and long-lasting quality.",
-      },
-    ],
-  }),
+  head: () =>
+    seo(
+      "About New Maharaja Furniture",
+      "Learn about New Maharaja Furniture, a trusted furniture store in Coimbatore offering premium teak wood furniture, custom furniture and quality craftsmanship.",
+      "/about",
+    ),
   component: About,
 });
 

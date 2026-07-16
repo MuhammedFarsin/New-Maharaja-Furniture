@@ -5,20 +5,16 @@ import { Button } from "@/components/ui/button";
 import { BUSINESS, WHATSAPP_URL } from "@/lib/config";
 import { Navbar } from "@/scenes/navbar";
 import Footer from "@/scenes/Footer";
+import { seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      {
-        title: "Contact Maharaja Furniture",
-      },
-      {
-        name: "description",
-        content:
-          "Contact Maharaja Furniture for teak furniture enquiries, custom designs, showroom hours and directions.",
-      },
-    ],
-  }),
+  head: () =>
+    seo(
+      "Contact New Maharaja Furniture | Showroom & Enquiries",
+      "Contact New Maharaja Furniture in Ganeshapuram, Kunnathur, Coimbatore for furniture enquiries, showroom information, custom furniture and WhatsApp support.",
+      "/contact"
+    ),
+
   component: Contact,
 });
 
