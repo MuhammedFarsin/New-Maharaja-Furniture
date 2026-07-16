@@ -3,15 +3,8 @@ import { Eye, Gem, Target, type LucideIcon } from "lucide-react";
 import { images } from "@/lib/furniture-data";
 import { Navbar } from "@/scenes/navbar";
 import Footer from "@/scenes/Footer";
-import { seo } from "@/lib/seo";
-
+import { Helmet } from "react-helmet-async";
 export const Route = createFileRoute("/about")({
-  head: () =>
-    seo(
-      "About New Maharaja Furniture",
-      "Learn about New Maharaja Furniture, a trusted furniture store in Coimbatore offering premium teak wood furniture, custom furniture and quality craftsmanship.",
-      "/about",
-    ),
   component: About,
 });
 
@@ -38,6 +31,59 @@ const pillars: Pillar[] = [
 function About() {
   return (
     <>
+    <Helmet>
+        <title>About New Maharaja Furniture | Premium Teak Furniture in Coimbatore</title>
+
+        <meta
+          name="description"
+          content="Learn about New Maharaja Furniture in Ganeshapuram, Kunnathur, Coimbatore. We specialize in premium teak wood furniture, custom furniture, quality craftsmanship and customer satisfaction."
+        />
+
+        <meta
+          name="keywords"
+          content="About New Maharaja Furniture, teak furniture Coimbatore, wooden furniture showroom, custom furniture, furniture shop Coimbatore"
+        />
+
+        <meta
+          property="og:title"
+          content="About New Maharaja Furniture | Premium Teak Furniture in Coimbatore"
+        />
+
+        <meta
+          property="og:description"
+          content="Discover New Maharaja Furniture's commitment to quality teak wood furniture, custom furniture and excellent customer service."
+        />
+
+        <meta
+          property="og:url"
+          content="https://new-maharaja-furniture.vercel.app/about"
+        />
+
+        <meta
+          property="og:type"
+          content="website"
+        />
+
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+        />
+
+        <meta
+          name="twitter:title"
+          content="About New Maharaja Furniture | Premium Teak Furniture in Coimbatore"
+        />
+
+        <meta
+          name="twitter:description"
+          content="Learn about New Maharaja Furniture, your trusted destination for premium teak wood furniture and custom furniture in Coimbatore."
+        />
+
+        <link
+          rel="canonical"
+          href="https://new-maharaja-furniture.vercel.app/about"
+        />
+      </Helmet>
       <Navbar />
 
       {/* Story */}

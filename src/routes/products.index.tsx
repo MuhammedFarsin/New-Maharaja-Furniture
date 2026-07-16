@@ -2,29 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { z } from "zod";
-
+import { Helmet } from "react-helmet-async";
 import { ProductCardV2 } from "@/components/product-card-v2";
 import { useCategories, useProducts } from "@/lib/products-db";
 import { Navbar } from "@/scenes/navbar";
 import Footer from "@/scenes/Footer";
-import { seo } from "@/lib/seo";
 
 const searchSchema = z.object({
   category: z.string().optional(),
   collection: z.string().optional(),
 });
 
-
 export const Route = createFileRoute("/products/")({
   validateSearch: searchSchema,
-
-  head: () =>
-    seo(
-      "Furniture Products | New Maharaja Furniture",
-      "Browse premium teak wood furniture including sofa sets, cots, wardrobes, dining tables, TV units, mattresses, chairs and custom furniture in Coimbatore.",
-      "/products"
-    ),
-
   component: ProductsPage,
 });
 
@@ -57,9 +47,7 @@ function ProductsPage() {
   const { data: categories = [] } = useCategories();
 
   const [query, setQuery] = useState("");
-  const [categorySlug, setCategorySlug] = useState(
-    search.category ?? "all"
-  );
+  const [categorySlug, setCategorySlug] = useState(search.category ?? "all");
 
   const selectedCollection = search.collection ?? null;
 
@@ -74,45 +62,57 @@ function ProductsPage() {
       },
       ...categories,
     ],
-    [categories]
+    [categories],
   );
 
   const shown = useMemo(() => {
     return products.filter((p) => {
-      const collectionMatch =
-        !selectedCollection ||
-        p.collection?.slug === selectedCollection;
+      const collectionMatch = !selectedCollection || p.collection?.slug === selectedCollection;
 
-      const categoryMatch =
-        categorySlug === "all" ||
-        p.category?.slug === categorySlug;
+      const categoryMatch = categorySlug === "all" || p.category?.slug === categorySlug;
 
-      const searchMatch =
-        p.name.toLowerCase().includes(query.toLowerCase());
+      const searchMatch = p.name.toLowerCase().includes(query.toLowerCase());
 
       return collectionMatch && categoryMatch && searchMatch;
     });
-  }, [
-    products,
-    query,
-    categorySlug,
-    selectedCollection,
-  ]);
+  }, [products, query, categorySlug, selectedCollection]);
 
   return (
     <>
+      <Helmet>
+        <title>Furniture Products | New Maharaja Furniture</title>
+
+        <meta
+          name="description"
+          content="Browse premium teak wood furniture including sofa sets, cots, wardrobes, dining tables, TV units, mattresses, chairs and custom furniture in Coimbatore."
+        />
+
+        <meta
+          name="keywords"
+          content="teak furniture, wooden furniture, sofa sets, cots, wardrobes, dining tables, TV units, mattresses, Coimbatore furniture"
+        />
+
+        <meta property="og:title" content="Furniture Products | Maharaja Furniture" />
+
+        <meta
+          property="og:description"
+          content="Browse premium teak wood furniture including sofa sets, cots, wardrobes, dining tables, TV units and more."
+        />
+
+        <meta property="og:url" content="https://new-maharaja-furniture.vercel.app/products" />
+
+        <meta property="og:type" content="website" />
+
+        <link rel="canonical" href="https://new-maharaja-furniture.vercel.app/products" />
+      </Helmet>
       <Navbar />
 
       <div className="min-h-screen bg-[#fafafa] pt-28 pb-24">
-
         <div className="mx-auto max-w-7xl px-4">
-
           {/* Search */}
 
           <div className="mx-auto mb-6 max-w-md">
-
             <label className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-sm">
-
               <Search className="h-5 w-5 text-neutral-400" />
 
               <input
@@ -121,24 +121,17 @@ function ProductsPage() {
                 placeholder="Search furniture..."
                 className="w-full bg-transparent outline-none"
               />
-
             </label>
-
           </div>
 
           {/* Categories */}
 
           <div className="mb-8 overflow-x-auto">
-
             <div className="flex gap-3 pb-2 w-max">
-
               {allCategories.map((category) => (
-
                 <button
                   key={category.id}
-                  onClick={() =>
-                    setCategorySlug(category.slug)
-                  }
+                  onClick={() => setCategorySlug(category.slug)}
                   className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 ${
                     categorySlug === category.slug
                       ? "bg-red-600 text-white shadow-lg"
@@ -147,48 +140,39 @@ function ProductsPage() {
                 >
                   {category.name}
                 </button>
-
               ))}
-
             </div>
-
           </div>
 
           {/* Product Grid */}
 
           <main ref={gridRef}>
-                      {isLoading ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))}
-            </div>
-          ) : shown.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-              {shown.map((product) => (
-                <ProductCardV2
-                  key={product.id}
-                  product={product}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-24">
+            {isLoading ? (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))}
+              </div>
+            ) : shown.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+                {shown.map((product) => (
+                  <ProductCardV2 key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-24">
+                <h2 className="text-2xl font-semibold text-neutral-800">No products found</h2>
 
-              <h2 className="text-2xl font-semibold text-neutral-800">
-                No products found
-              </h2>
+                <p className="mt-3 text-center text-neutral-500">
+                  Try another search or choose a different category.
+                </p>
 
-              <p className="mt-3 text-center text-neutral-500">
-                Try another search or choose a different category.
-              </p>
-
-              <button
-                onClick={() => {
-                  setQuery("");
-                  setCategorySlug("all");
-                }}
-                className="
+                <button
+                  onClick={() => {
+                    setQuery("");
+                    setCategorySlug("all");
+                  }}
+                  className="
                   mt-6
                   rounded-full
                   bg-red-600
@@ -199,23 +183,18 @@ function ProductsPage() {
                   transition
                   hover:bg-red-700
                 "
-              >
-                Clear Filters
-              </button>
-
-            </div>
-          )}
-
-        </main>
-
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
 
-    </div>
-
-    <Footer />
-
-  </>
-);
+      <Footer />
+    </>
+  );
 }
 
 export default ProductsPage;

@@ -5,16 +5,8 @@ import { Button } from "@/components/ui/button";
 import { BUSINESS, WHATSAPP_URL } from "@/lib/config";
 import { Navbar } from "@/scenes/navbar";
 import Footer from "@/scenes/Footer";
-import { seo } from "@/lib/seo";
-
+import { Helmet } from "react-helmet-async";
 export const Route = createFileRoute("/contact")({
-  head: () =>
-    seo(
-      "Contact New Maharaja Furniture | Showroom & Enquiries",
-      "Contact New Maharaja Furniture in Ganeshapuram, Kunnathur, Coimbatore for furniture enquiries, showroom information, custom furniture and WhatsApp support.",
-      "/contact"
-    ),
-
   component: Contact,
 });
 
@@ -22,6 +14,51 @@ function Contact() {
   return (
     <>
       <Navbar />
+      <Helmet>
+        <title>Contact Maharaja Furniture | Showroom & Enquiries</title>
+
+        <meta
+          name="description"
+          content="Contact New Maharaja Furniture in Ganeshapuram, Kunnathur, Coimbatore for premium teak wood furniture enquiries, custom furniture, showroom timings and WhatsApp support."
+        />
+
+        <meta
+          property="og:title"
+          content="Contact New Maharaja Furniture | Showroom & Enquiries"
+        />
+
+        <meta
+          property="og:description"
+          content="Get in touch with New Maharaja Furniture for premium teak wood furniture, custom furniture and showroom enquiries."
+        />
+
+        <meta
+          property="og:url"
+          content="https://new-maharaja-furniture.vercel.app/contact"
+        />
+
+        <meta property="og:type" content="website" />
+
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+        />
+
+        <meta
+          name="twitter:title"
+          content="Contact New Maharaja Furniture | Showroom & Enquiries"
+        />
+
+        <meta
+          name="twitter:description"
+          content="Contact New Maharaja Furniture for premium teak wood furniture enquiries, showroom details and WhatsApp support."
+        />
+
+        <link
+          rel="canonical"
+          href="https://new-maharaja-furniture.vercel.app/contact"
+        />
+      </Helmet>
       {/* Hero */}
       <section className="bg-[#faf8f5] px-4 py-24 sm:px-6">
         <div className="mx-auto max-w-5xl text-center">
