@@ -201,7 +201,7 @@ Please let me know whether this product is available.`,
                       key={img.id}
                       src={img.url}
                       alt={product.name}
-                      className="h-[78vw] max-h-[440px] w-full shrink-0 snap-center object-cover"
+                      className="h-[78vw] max-h-[440px] w-full shrink-0 snap-center object-contain"
                     />
                   ))}
                 </div>
